@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.20'
+    id 'maven-publish'
 }
 
 android {
@@ -38,4 +39,48 @@ dependencies {
 
     // JSON
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+}
+
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+static def findLocalGitHubToken() {
+    def output = ['gh', 'auth', 'status', '-t'].execute().err.text
+    def matcher = output =~ /Token: (\w+)/
+    if (matcher) {
+        def token = matcher[0][1]
+        // TODO Check for access scopes here
+        return token
+    }
+    throw new RuntimeException("Could not find your GitHub token. Run `gh auth login`")
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+
+                groupId 'com.geckour.libraries.android'
+                artifactId "now-playing-subject-builder"
+                version "1.0.0"
+            }
+        }
+
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                /** Configure path of your package repository on Github
+                 *  Replace GITHUB_USERID with your/organisation Github userID and REPOSITORY with the repository name on GitHub
+                 */
+                url = uri("https://maven.pkg.github.com/geckour/NowPlayingSubjectBuilder")
+
+                credentials {
+                    /**Create github.properties in root project folder file with gpr.usr=GITHUB_USER_ID  & gpr.key=PERSONAL_ACCESS_TOKEN**/
+                    username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                    password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+                }
+            }
+        }
+    }
 }
