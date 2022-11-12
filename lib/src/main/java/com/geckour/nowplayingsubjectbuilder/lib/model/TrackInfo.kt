@@ -15,7 +15,7 @@ data class TrackInfo(
     val spotifyUrl: String?
 ) {
 
-    internal fun isSatisfiedSpecifier(sharingFormatText: String): Boolean =
+    fun isSatisfiedSpecifier(sharingFormatText: String): Boolean =
         sharingFormatText.containedPatterns.all {
             when (it) {
                 FormatPattern.TITLE -> this.title != null
