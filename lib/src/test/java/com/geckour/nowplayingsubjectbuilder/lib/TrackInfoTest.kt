@@ -13,7 +13,6 @@ class TrackInfoTest {
         null,
         null,
         null,
-        null
     )
     private val fullInfo = TrackInfo(
         "hoge",
@@ -21,7 +20,6 @@ class TrackInfoTest {
         "piyo",
         "nyan",
         "wan",
-        "pao",
     )
 
     @Test
@@ -60,7 +58,7 @@ class TrackInfoTest {
         val formatString = "TIARALCOSU\\n'''TI'''"
         val actual = fullInfo.getSharingSubject(formatString)
 
-        assertThat(actual).isEqualTo("hogefugapiyonyanpao\n'TI'")
+        assertThat(actual).isEqualTo("hogefugapiyonyanwan\n'TI'")
     }
 
     @Test
