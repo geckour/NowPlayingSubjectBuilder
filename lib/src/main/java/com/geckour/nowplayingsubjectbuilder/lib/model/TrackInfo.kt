@@ -11,7 +11,6 @@ data class TrackInfo(
     val artist: String?,
     val album: String?,
     val composer: String?,
-    val artworkUriString: String?,
     val spotifyUrl: String?
 ) {
 

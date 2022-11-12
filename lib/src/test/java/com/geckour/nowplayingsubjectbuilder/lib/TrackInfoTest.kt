@@ -50,7 +50,7 @@ class TrackInfoTest {
 
     @Test
     fun `isSatisfiedSpecifier returns false when given not empty pattern with not empty but contains no match parameter TrackInfo`() {
-        val info = emptyInfo.copy(artworkUriString = "hoge")
+        val info = emptyInfo.copy(artist = "hoge")
         val actual = info.isSatisfiedSpecifier(FormatPattern.TITLE.value)
         assertThat(actual).isFalse()
     }
