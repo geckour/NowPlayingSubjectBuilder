@@ -22,7 +22,7 @@ fun String.splitConsideringEscape(): List<String> =
         val escapes = splitList.mapIndexed { i, s -> Pair(i, s) }.filter { it.second == "'" }
             .apply { if (lastIndex < 0) return@let splitList }
 
-        return@let ArrayList<String>().apply {
+        return@let mutableListOf<String>().apply {
             for (i in 0 until escapes.lastIndex step 2) {
                 this.addAll(
                     splitList.subList(
@@ -43,20 +43,21 @@ fun String.splitConsideringEscape(): List<String> =
                     else splitList.lastIndex, splitList.size
                 )
             )
-        }
+        }.filter { it.isNotEmpty() }
     }
 
-fun String.splitIncludeDelimiter(vararg delimiters: String) =
+private fun String.splitIncludeDelimiter(vararg delimiters: String) =
     delimiters.joinToString("|").let { pattern ->
         this.split(Regex("(?<=$pattern)|(?=$pattern)"))
     }
 
-fun String.getReplacerWithModifier(
-    modifiers: List<FormatPatternModifier>, identifier: String
-): String = "${modifiers.getPrefix(identifier)}$this${modifiers.getSuffix(identifier)}"
+fun String.withModifiers(
+    modifiers: List<FormatPatternModifier>,
+    identifier: FormatPattern
+): String = "${modifiers.getPrefix(identifier.value)}$this${modifiers.getSuffix(identifier.value)}"
 
-fun List<FormatPatternModifier>.getPrefix(value: String): String =
+private fun List<FormatPatternModifier>.getPrefix(value: String): String =
     this.firstOrNull { m -> m.key.value == value }?.prefix ?: ""
 
-fun List<FormatPatternModifier>.getSuffix(value: String): String =
+private fun List<FormatPatternModifier>.getSuffix(value: String): String =
     this.firstOrNull { m -> m.key.value == value }?.suffix ?: ""

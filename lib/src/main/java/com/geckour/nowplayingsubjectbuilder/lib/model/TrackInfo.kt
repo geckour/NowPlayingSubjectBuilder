@@ -1,8 +1,8 @@
 package com.geckour.nowplayingsubjectbuilder.lib.model
 
 import com.geckour.nowplayingsubjectbuilder.lib.util.containedPatterns
-import com.geckour.nowplayingsubjectbuilder.lib.util.getReplacerWithModifier
 import com.geckour.nowplayingsubjectbuilder.lib.util.splitConsideringEscape
+import com.geckour.nowplayingsubjectbuilder.lib.util.withModifiers
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,11 +12,10 @@ data class TrackInfo(
     val album: String?,
     val composer: String?,
     val artworkUriString: String?,
-    val playerPackageName: String?,
     val spotifyUrl: String?
 ) {
 
-    private fun isSatisfiedSpecifier(sharingFormatText: String): Boolean =
+    internal fun isSatisfiedSpecifier(sharingFormatText: String): Boolean =
         sharingFormatText.containedPatterns.all {
             when (it) {
                 FormatPattern.TITLE -> this.title != null
@@ -36,29 +35,17 @@ data class TrackInfo(
         if (requireMatchAllPattern && isSatisfiedSpecifier(sharingFormatText).not()) return null
 
         return sharingFormatText.splitConsideringEscape().joinToString("") {
-            return@joinToString Regex("^'(.+)'$").let { regex ->
-                if (it.matches(regex)) it.replace(regex, "$1")
-                else when (it) {
-                    FormatPattern.S_QUOTE.value -> ""
-                    FormatPattern.S_QUOTE_DOUBLE.value -> "'"
-                    FormatPattern.TITLE.value -> title?.getReplacerWithModifier(
-                        modifiers, it
-                    ) ?: ""
-                    FormatPattern.ARTIST.value -> artist?.getReplacerWithModifier(
-                        modifiers, it
-                    ) ?: ""
-                    FormatPattern.ALBUM.value -> album?.getReplacerWithModifier(
-                        modifiers, it
-                    ) ?: ""
-                    FormatPattern.COMPOSER.value -> composer?.getReplacerWithModifier(
-                        modifiers, it
-                    ) ?: ""
-                    FormatPattern.SPOTIFY_URL.value -> spotifyUrl?.getReplacerWithModifier(
-                        modifiers, it
-                    ) ?: ""
-                    FormatPattern.NEW_LINE.value -> "\n"
-                    else -> it
-                }
+            val regex = Regex("^'([\\s\\S]+)'$")
+            return@joinToString if (it.matches(regex)) it.replace(regex, "$1") else when (it) {
+                FormatPattern.S_QUOTE.value -> ""
+                FormatPattern.S_QUOTE_DOUBLE.value -> "'"
+                FormatPattern.TITLE.value -> title?.withModifiers(modifiers, FormatPattern.TITLE) ?: ""
+                FormatPattern.ARTIST.value -> artist?.withModifiers(modifiers, FormatPattern.ARTIST) ?: ""
+                FormatPattern.ALBUM.value -> album?.withModifiers(modifiers, FormatPattern.ALBUM) ?: ""
+                FormatPattern.COMPOSER.value -> composer?.withModifiers(modifiers, FormatPattern.COMPOSER) ?: ""
+                FormatPattern.SPOTIFY_URL.value -> spotifyUrl?.withModifiers(modifiers, FormatPattern.SPOTIFY_URL) ?: ""
+                FormatPattern.NEW_LINE.value -> "\n"
+                else -> it
             }
         }
     }
