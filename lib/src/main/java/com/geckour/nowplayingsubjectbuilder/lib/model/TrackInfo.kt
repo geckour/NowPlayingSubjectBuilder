@@ -11,7 +11,8 @@ data class TrackInfo(
     val artist: String?,
     val album: String?,
     val composer: String?,
-    val spotifyUrl: String?
+    val spotifyUrl: String?,
+    val youTubeMusicUrl: String?
 ) {
 
     fun isSatisfiedSpecifier(sharingFormatText: String): Boolean =
@@ -22,6 +23,7 @@ data class TrackInfo(
                 FormatPattern.ALBUM -> this.album != null
                 FormatPattern.COMPOSER -> this.composer != null
                 FormatPattern.SPOTIFY_URL -> this.spotifyUrl != null
+                FormatPattern.YOUTUBE_MUSIC_URL -> this.youTubeMusicUrl != null
                 else -> true
             }
         }
@@ -38,11 +40,12 @@ data class TrackInfo(
             return@joinToString if (it.matches(regex)) it.replace(regex, "$1") else when (it) {
                 FormatPattern.S_QUOTE.value -> ""
                 FormatPattern.S_QUOTE_DOUBLE.value -> "'"
-                FormatPattern.TITLE.value -> title?.withModifiers(modifiers, FormatPattern.TITLE) ?: ""
-                FormatPattern.ARTIST.value -> artist?.withModifiers(modifiers, FormatPattern.ARTIST) ?: ""
-                FormatPattern.ALBUM.value -> album?.withModifiers(modifiers, FormatPattern.ALBUM) ?: ""
-                FormatPattern.COMPOSER.value -> composer?.withModifiers(modifiers, FormatPattern.COMPOSER) ?: ""
-                FormatPattern.SPOTIFY_URL.value -> spotifyUrl?.withModifiers(modifiers, FormatPattern.SPOTIFY_URL) ?: ""
+                FormatPattern.TITLE.value -> title?.withModifiers(modifiers, FormatPattern.TITLE).orEmpty()
+                FormatPattern.ARTIST.value -> artist?.withModifiers(modifiers, FormatPattern.ARTIST).orEmpty()
+                FormatPattern.ALBUM.value -> album?.withModifiers(modifiers, FormatPattern.ALBUM).orEmpty()
+                FormatPattern.COMPOSER.value -> composer?.withModifiers(modifiers, FormatPattern.COMPOSER).orEmpty()
+                FormatPattern.SPOTIFY_URL.value -> spotifyUrl?.withModifiers(modifiers, FormatPattern.SPOTIFY_URL).orEmpty()
+                FormatPattern.YOUTUBE_MUSIC_URL.value -> youTubeMusicUrl?.withModifiers(modifiers, FormatPattern.YOUTUBE_MUSIC_URL).orEmpty()
                 FormatPattern.NEW_LINE.value -> "\n"
                 else -> it
             }
