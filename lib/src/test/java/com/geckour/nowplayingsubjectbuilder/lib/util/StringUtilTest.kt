@@ -9,7 +9,7 @@ class StringUtilTest {
 
     @Test
     fun `containedPattern test 1`() {
-        val formatString = "TIARALCOSU\\n'''TI'''"
+        val formatString = "TIARALCOSUYU\\n'''TI'''"
         val actual = formatString.containedPatterns
 
         assertThat(actual).isEqualTo(
@@ -19,6 +19,7 @@ class StringUtilTest {
                 FormatPattern.ALBUM,
                 FormatPattern.COMPOSER,
                 FormatPattern.SPOTIFY_URL,
+                FormatPattern.YOUTUBE_MUSIC_URL,
                 FormatPattern.NEW_LINE,
                 FormatPattern.S_QUOTE_DOUBLE,
                 FormatPattern.S_QUOTE_DOUBLE,
