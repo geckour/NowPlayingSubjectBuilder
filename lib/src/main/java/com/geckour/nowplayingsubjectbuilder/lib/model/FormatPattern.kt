@@ -9,6 +9,7 @@ enum class FormatPattern(val value: String) {
     COMPOSER("CO"),
     SPOTIFY_URL("SU"),
     YOUTUBE_MUSIC_URL("YU"),
+    APPLE_MUSIC_URL("AU"),
     NEW_LINE("\\n");
 
     companion object {

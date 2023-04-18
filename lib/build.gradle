@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.20'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.20'
     id 'maven-publish'
 }
 
@@ -38,22 +38,11 @@ dependencies {
     testImplementation "com.google.truth:truth:1.1.3"
 
     // JSON
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
 }
 
 def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
-
-static def findLocalGitHubToken() {
-    def output = ['gh', 'auth', 'status', '-t'].execute().err.text
-    def matcher = output =~ /Token: (\w+)/
-    if (matcher) {
-        def token = matcher[0][1]
-        // TODO Check for access scopes here
-        return token
-    }
-    throw new RuntimeException("Could not find your GitHub token. Run `gh auth login`")
-}
 
 afterEvaluate {
     publishing {
@@ -63,7 +52,7 @@ afterEvaluate {
 
                 groupId 'com.geckour.libraries.android'
                 artifactId "now-playing-subject-builder"
-                version "1.1.1"
+                version "1.2.0"
             }
         }
 
