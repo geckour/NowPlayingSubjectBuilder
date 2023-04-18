@@ -14,6 +14,7 @@ data class TrackInfo(
     val spotifyUrl: String?,
     val youTubeMusicUrl: String?,
     val appleMusicUrl: String?,
+    val pixelNowPlaying: String?,
 ) {
 
     fun isSatisfiedSpecifier(sharingFormatText: String): Boolean =
@@ -26,6 +27,7 @@ data class TrackInfo(
                 FormatPattern.SPOTIFY_URL -> this.spotifyUrl != null
                 FormatPattern.YOUTUBE_MUSIC_URL -> this.youTubeMusicUrl != null
                 FormatPattern.APPLE_MUSIC_URL -> this.appleMusicUrl != null
+                FormatPattern.PIXEL_NOW_PLAYING -> this.pixelNowPlaying != null
                 else -> true
             }
         }
@@ -49,6 +51,7 @@ data class TrackInfo(
                 FormatPattern.SPOTIFY_URL.value -> spotifyUrl?.withModifiers(modifiers, FormatPattern.SPOTIFY_URL).orEmpty()
                 FormatPattern.YOUTUBE_MUSIC_URL.value -> youTubeMusicUrl?.withModifiers(modifiers, FormatPattern.YOUTUBE_MUSIC_URL).orEmpty()
                 FormatPattern.APPLE_MUSIC_URL.value -> appleMusicUrl?.withModifiers(modifiers, FormatPattern.APPLE_MUSIC_URL).orEmpty()
+                FormatPattern.PIXEL_NOW_PLAYING.value -> pixelNowPlaying?.withModifiers(modifiers, FormatPattern.PIXEL_NOW_PLAYING).orEmpty()
                 FormatPattern.NEW_LINE.value -> "\n"
                 else -> it
             }
