@@ -12,7 +12,8 @@ data class TrackInfo(
     val album: String?,
     val composer: String?,
     val spotifyUrl: String?,
-    val youTubeMusicUrl: String?
+    val youTubeMusicUrl: String?,
+    val appleMusicUrl: String?,
 ) {
 
     fun isSatisfiedSpecifier(sharingFormatText: String): Boolean =
@@ -24,6 +25,7 @@ data class TrackInfo(
                 FormatPattern.COMPOSER -> this.composer != null
                 FormatPattern.SPOTIFY_URL -> this.spotifyUrl != null
                 FormatPattern.YOUTUBE_MUSIC_URL -> this.youTubeMusicUrl != null
+                FormatPattern.APPLE_MUSIC_URL -> this.appleMusicUrl != null
                 else -> true
             }
         }
@@ -46,6 +48,7 @@ data class TrackInfo(
                 FormatPattern.COMPOSER.value -> composer?.withModifiers(modifiers, FormatPattern.COMPOSER).orEmpty()
                 FormatPattern.SPOTIFY_URL.value -> spotifyUrl?.withModifiers(modifiers, FormatPattern.SPOTIFY_URL).orEmpty()
                 FormatPattern.YOUTUBE_MUSIC_URL.value -> youTubeMusicUrl?.withModifiers(modifiers, FormatPattern.YOUTUBE_MUSIC_URL).orEmpty()
+                FormatPattern.APPLE_MUSIC_URL.value -> appleMusicUrl?.withModifiers(modifiers, FormatPattern.APPLE_MUSIC_URL).orEmpty()
                 FormatPattern.NEW_LINE.value -> "\n"
                 else -> it
             }
