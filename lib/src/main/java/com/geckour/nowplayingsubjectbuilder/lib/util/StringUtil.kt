@@ -18,6 +18,8 @@ fun String.splitConsideringEscape(): List<String> =
         FormatPattern.COMPOSER.value,
         FormatPattern.SPOTIFY_URL.value,
         FormatPattern.YOUTUBE_MUSIC_URL.value,
+        FormatPattern.APPLE_MUSIC_URL.value,
+        FormatPattern.PIXEL_NOW_PLAYING.value,
         "\\\\n"
     ).let { splitList ->
         val escapes = splitList.mapIndexed { i, s -> Pair(i, s) }.filter { it.second == "'" }
