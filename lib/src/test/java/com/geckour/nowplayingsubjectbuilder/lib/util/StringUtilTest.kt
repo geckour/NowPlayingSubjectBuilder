@@ -7,22 +7,32 @@ import org.junit.Test
 
 class StringUtilTest {
 
+    val formatPatterns = listOf(
+        FormatPattern(key = "TI", value = ""),
+        FormatPattern(key = "AR", value = ""),
+        FormatPattern(key = "AL", value = ""),
+        FormatPattern(key = "CO", value = ""),
+        FormatPattern(key = "SU", value = ""),
+        FormatPattern(key = "YU", value = ""),
+        FormatPattern(key = "AU", value = ""),
+        FormatPattern(key = "PN", value = ""),
+    )
+
     @Test
     fun `containedPattern test 1`() {
-        val formatString = "TIARALCOSUYU\\n'''TI'''"
-        val actual = formatString.containedPatterns
+        val formatString = "TIARALCOSUYUAUPN\\n'''TI'''"
+        val actual = formatString.getContainedPatterns(formatPatterns)
 
         assertThat(actual).isEqualTo(
             listOf(
-                FormatPattern.TITLE,
-                FormatPattern.ARTIST,
-                FormatPattern.ALBUM,
-                FormatPattern.COMPOSER,
-                FormatPattern.SPOTIFY_URL,
-                FormatPattern.YOUTUBE_MUSIC_URL,
-                FormatPattern.NEW_LINE,
-                FormatPattern.S_QUOTE_DOUBLE,
-                FormatPattern.S_QUOTE_DOUBLE,
+                formatPatterns[0],
+                formatPatterns[1],
+                formatPatterns[2],
+                formatPatterns[3],
+                formatPatterns[4],
+                formatPatterns[5],
+                formatPatterns[6],
+                formatPatterns[7],
             )
         )
     }
@@ -30,14 +40,13 @@ class StringUtilTest {
     @Test
     fun `containedPattern test 2`() {
         val formatString = "TIItiAL\n'''TI"
-        val actual = formatString.containedPatterns
+        val actual = formatString.getContainedPatterns(formatPatterns)
 
         assertThat(actual).isEqualTo(
             listOf(
-                FormatPattern.TITLE,
-                FormatPattern.ALBUM,
-                FormatPattern.S_QUOTE_DOUBLE,
-                FormatPattern.TITLE,
+                formatPatterns[0],
+                formatPatterns[2],
+                formatPatterns[0],
             )
         )
     }
@@ -45,26 +54,27 @@ class StringUtilTest {
     @Test
     fun `containedPattern test 3`() {
         val formatString = "'TIItiAL\n'''TI"
-        val actual = formatString.containedPatterns
+        val actual = formatString.getContainedPatterns(formatPatterns)
 
-        assertThat(actual).isEqualTo(
-            listOf(
-                FormatPattern.S_QUOTE_DOUBLE,
-                FormatPattern.TITLE,
-            )
-        )
+        assertThat(actual).isEqualTo(listOf(formatPatterns[0]))
     }
 
     @Test
     fun `withModifiers test 1`() {
-        val actual = "Hoge".withModifiers(listOf(FormatPatternModifier(FormatPattern.TITLE, "Fuga", "Piyo")), FormatPattern.TITLE)
+        val actual = "Hoge".withModifiers(
+            listOf(FormatPatternModifier(formatPatterns[0], "Fuga", "Piyo")),
+            formatPatterns[0]
+        )
 
         assertThat(actual).isEqualTo("FugaHogePiyo")
     }
 
     @Test
     fun `withModifiers test 2`() {
-        val actual = "Hoge".withModifiers(listOf(FormatPatternModifier(FormatPattern.TITLE, "Fuga", "Piyo")), FormatPattern.ARTIST)
+        val actual = "Hoge".withModifiers(
+            listOf(FormatPatternModifier(formatPatterns[0], "Fuga", "Piyo")),
+            formatPatterns[1]
+        )
 
         assertThat(actual).isEqualTo("Hoge")
     }
@@ -73,10 +83,10 @@ class StringUtilTest {
     fun `withModifiers test 3`() {
         val actual = "Hoge".withModifiers(
             listOf(
-                FormatPatternModifier(FormatPattern.TITLE, "Fuga", "Piyo"),
-                FormatPatternModifier(FormatPattern.ARTIST, "Nyan", "Wan"),
+                FormatPatternModifier(formatPatterns[0], "Fuga", "Piyo"),
+                FormatPatternModifier(formatPatterns[1], "Nyan", "Wan"),
             ),
-            FormatPattern.ARTIST
+            formatPatterns[1]
         )
 
         assertThat(actual).isEqualTo("NyanHogeWan")
@@ -86,11 +96,11 @@ class StringUtilTest {
     fun `withModifiers test 4`() {
         val actual = "Hoge".withModifiers(
             listOf(
-                FormatPatternModifier(FormatPattern.TITLE, "Fuga", "Piyo"),
-                FormatPatternModifier(FormatPattern.ARTIST, "Nyan", "Wan"),
-                FormatPatternModifier(FormatPattern.TITLE, "Pao", "Gao"),
+                FormatPatternModifier(formatPatterns[0], "Fuga", "Piyo"),
+                FormatPatternModifier(formatPatterns[1], "Nyan", "Wan"),
+                FormatPatternModifier(formatPatterns[0], "Pao", "Gao"),
             ),
-            FormatPattern.TITLE
+            formatPatterns[0]
         )
 
         assertThat(actual).isEqualTo("FugaHogePiyo")
@@ -98,21 +108,30 @@ class StringUtilTest {
 
     @Test
     fun `withModifiers test 5`() {
-        val actual = "Hoge".withModifiers(listOf(FormatPatternModifier(FormatPattern.TITLE, suffix = "Piyo")), FormatPattern.TITLE)
+        val actual = "Hoge".withModifiers(
+            listOf(FormatPatternModifier(formatPatterns[0], suffix = "Piyo")),
+            formatPatterns[0]
+        )
 
         assertThat(actual).isEqualTo("HogePiyo")
     }
 
     @Test
     fun `withModifiers test 6`() {
-        val actual = "Hoge".withModifiers(listOf(FormatPatternModifier(FormatPattern.TITLE, prefix = "Fuga")), FormatPattern.TITLE)
+        val actual = "Hoge".withModifiers(
+            listOf(FormatPatternModifier(formatPatterns[0], prefix = "Fuga")),
+            formatPatterns[0]
+        )
 
         assertThat(actual).isEqualTo("FugaHoge")
     }
 
     @Test
     fun `withModifiers test 7`() {
-        val actual = "".withModifiers(listOf(FormatPatternModifier(FormatPattern.TITLE, "Fuga", "Piyo")), FormatPattern.TITLE)
+        val actual = "".withModifiers(
+            listOf(FormatPatternModifier(formatPatterns[0], "Fuga", "Piyo")),
+            formatPatterns[0]
+        )
 
         assertThat(actual).isEqualTo("FugaPiyo")
     }
@@ -120,7 +139,7 @@ class StringUtilTest {
     @Test
     fun `splitConsideringEscape test 1`() {
         val formatString = "TIARALCOSU\\n'''TI'''"
-        val actual = formatString.splitConsideringEscape()
+        val actual = formatString.splitConsideringEscape(formatPatterns)
 
         assertThat(actual).isEqualTo(
             listOf(
@@ -140,7 +159,7 @@ class StringUtilTest {
     @Test
     fun `splitConsideringEscape test 2`() {
         val formatString = "TIItiAL\n'''TI"
-        val actual = formatString.splitConsideringEscape()
+        val actual = formatString.splitConsideringEscape(formatPatterns)
 
         assertThat(actual).isEqualTo(
             listOf(
@@ -157,7 +176,7 @@ class StringUtilTest {
     @Test
     fun `splitConsideringEscape test 3`() {
         val formatString = "'TIItiAL\n'''TI"
-        val actual = formatString.splitConsideringEscape()
+        val actual = formatString.splitConsideringEscape(formatPatterns)
 
         assertThat(actual).isEqualTo(
             listOf(

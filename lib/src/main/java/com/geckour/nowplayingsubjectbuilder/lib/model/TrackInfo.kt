@@ -1,34 +1,19 @@
 package com.geckour.nowplayingsubjectbuilder.lib.model
 
-import com.geckour.nowplayingsubjectbuilder.lib.util.containedPatterns
+import com.geckour.nowplayingsubjectbuilder.lib.util.getContainedPatterns
 import com.geckour.nowplayingsubjectbuilder.lib.util.splitConsideringEscape
 import com.geckour.nowplayingsubjectbuilder.lib.util.withModifiers
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class TrackInfo(
-    val title: String?,
-    val artist: String?,
-    val album: String?,
-    val composer: String?,
-    val spotifyUrl: String?,
-    val youTubeMusicUrl: String?,
-    val appleMusicUrl: String?,
-    val pixelNowPlaying: String?,
+    val formatPatterns: List<FormatPattern>,
 ) {
 
     fun isSatisfiedSpecifier(sharingFormatText: String): Boolean =
-        sharingFormatText.containedPatterns.all {
-            when (it) {
-                FormatPattern.TITLE -> this.title != null
-                FormatPattern.ARTIST -> this.artist != null
-                FormatPattern.ALBUM -> this.album != null
-                FormatPattern.COMPOSER -> this.composer != null
-                FormatPattern.SPOTIFY_URL -> this.spotifyUrl != null
-                FormatPattern.YOUTUBE_MUSIC_URL -> this.youTubeMusicUrl != null
-                FormatPattern.APPLE_MUSIC_URL -> this.appleMusicUrl != null
-                FormatPattern.PIXEL_NOW_PLAYING -> this.pixelNowPlaying != null
-                else -> true
+        sharingFormatText.isEmpty() || sharingFormatText.getContainedPatterns(formatPatterns).let {
+            it.isNotEmpty() && it.all { containedPattern ->
+                formatPatterns.map { it.key }.contains(containedPattern.key)
             }
         }
 
@@ -39,21 +24,34 @@ data class TrackInfo(
     ): String? {
         if (requireMatchAllPattern && isSatisfiedSpecifier(sharingFormatText).not()) return null
 
-        return sharingFormatText.splitConsideringEscape().joinToString("") {
+        return sharingFormatText.splitConsideringEscape(formatPatterns).joinToString("") {
             val regex = Regex("^'([\\s\\S]+)'$")
-            return@joinToString if (it.matches(regex)) it.replace(regex, "$1") else when (it) {
-                FormatPattern.S_QUOTE.value -> ""
-                FormatPattern.S_QUOTE_DOUBLE.value -> "'"
-                FormatPattern.TITLE.value -> title?.withModifiers(modifiers, FormatPattern.TITLE).orEmpty()
-                FormatPattern.ARTIST.value -> artist?.withModifiers(modifiers, FormatPattern.ARTIST).orEmpty()
-                FormatPattern.ALBUM.value -> album?.withModifiers(modifiers, FormatPattern.ALBUM).orEmpty()
-                FormatPattern.COMPOSER.value -> composer?.withModifiers(modifiers, FormatPattern.COMPOSER).orEmpty()
-                FormatPattern.SPOTIFY_URL.value -> spotifyUrl?.withModifiers(modifiers, FormatPattern.SPOTIFY_URL).orEmpty()
-                FormatPattern.YOUTUBE_MUSIC_URL.value -> youTubeMusicUrl?.withModifiers(modifiers, FormatPattern.YOUTUBE_MUSIC_URL).orEmpty()
-                FormatPattern.APPLE_MUSIC_URL.value -> appleMusicUrl?.withModifiers(modifiers, FormatPattern.APPLE_MUSIC_URL).orEmpty()
-                FormatPattern.PIXEL_NOW_PLAYING.value -> pixelNowPlaying?.withModifiers(modifiers, FormatPattern.PIXEL_NOW_PLAYING).orEmpty()
-                FormatPattern.NEW_LINE.value -> "\n"
-                else -> it
+            return@joinToString when {
+                it.matches(regex) -> {
+                    it.replace(regex, "$1")
+                }
+
+                it == "'" -> {
+                    ""
+                }
+
+                it == "''" -> {
+                    "'"
+                }
+
+                formatPatterns.map { it.key }.contains(it) -> {
+                    formatPatterns
+                        .first { pattern -> pattern.key == it }
+                        .let { pattern -> pattern.value?.withModifiers(modifiers, pattern).orEmpty() }
+                }
+
+                it == "\\n" -> {
+                    "\n"
+                }
+
+                else -> {
+                    it
+                }
             }
         }
     }

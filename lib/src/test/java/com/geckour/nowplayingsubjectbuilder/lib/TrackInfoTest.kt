@@ -9,33 +9,36 @@ import org.junit.Test
 class TrackInfoTest {
 
     private val emptyInfo = TrackInfo(
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
+        formatPatterns = emptyList()
     )
     private val fullInfo = TrackInfo(
-        "hoge",
-        "fuga",
-        "piyo",
-        "nyan",
-        "wan",
-        "pao"
+        formatPatterns = listOf(
+            FormatPattern(key = "TI", value = "hoge"),
+            FormatPattern(key = "AR", value = "fuga"),
+            FormatPattern(key = "AL", value = "piyo"),
+            FormatPattern(key = "CO", value = "nyan"),
+            FormatPattern(key = "SU", value = "wan"),
+            FormatPattern(key = "YU", value = "pao"),
+            FormatPattern(key = "AU", value = "pao"),
+            FormatPattern(key = "PN", value = "pao"),
+        )
     )
     private val containingEscapeInfo = TrackInfo(
-        "Don't mind baby",
-        "Rei, 長岡亮介",
-        "QUILT",
-        null,
-        "https://open.spotify.com/track/4NXFsWNZRd227EJL76rb16",
-        "https://music.youtube.com/watch?v=RbH_B-YPtbk",
+        formatPatterns = listOf(
+            FormatPattern(key = "TI", value = "Don't mind baby"),
+            FormatPattern(key = "AR", value = "Rei, 長岡亮介"),
+            FormatPattern(key = "AL", value = "QUILT"),
+            FormatPattern(key = "CO", value = null),
+            FormatPattern(key = "SU", value = "https://open.spotify.com/track/4NXFsWNZRd227EJL76rb16"),
+            FormatPattern(key = "YU", value = "https://music.youtube.com/watch?v=RbH_B-YPtbk"),
+            FormatPattern(key = "AU", value = null),
+            FormatPattern(key = "PN", value = null),
+        )
     )
 
     @Test
     fun `isSatisfiedSpecifier returns false when given not empty pattern with empty TrackInfo`() {
-        val actual = emptyInfo.isSatisfiedSpecifier(FormatPattern.TITLE.value)
+        val actual = emptyInfo.isSatisfiedSpecifier("TI")
         assertThat(actual).isFalse()
     }
 
@@ -47,7 +50,7 @@ class TrackInfoTest {
 
     @Test
     fun `isSatisfiedSpecifier returns true when given not empty pattern with full TrackInfo`() {
-        val actual = fullInfo.isSatisfiedSpecifier(FormatPattern.TITLE.value)
+        val actual = fullInfo.isSatisfiedSpecifier("TI")
         assertThat(actual).isTrue()
     }
 
@@ -59,8 +62,8 @@ class TrackInfoTest {
 
     @Test
     fun `isSatisfiedSpecifier returns false when given not empty pattern with not empty but contains no match parameter TrackInfo`() {
-        val info = emptyInfo.copy(artist = "hoge")
-        val actual = info.isSatisfiedSpecifier(FormatPattern.TITLE.value)
+        val info = TrackInfo(formatPatterns = listOf(FormatPattern(key = "AR", value = "hoge")))
+        val actual = info.isSatisfiedSpecifier("TI")
         assertThat(actual).isFalse()
     }
 
@@ -116,12 +119,12 @@ class TrackInfoTest {
     fun `getSharingSubject test 7`() {
         val formatString = "\nNowPlayingTIARALCOSUYU"
         val modifiers = listOf(
-            FormatPatternModifier(FormatPattern.TITLE, prefix = " ", suffix = ""),
-            FormatPatternModifier(FormatPattern.ARTIST, prefix = " - ", suffix = ""),
-            FormatPatternModifier(FormatPattern.ALBUM, prefix = " (", suffix = ")"),
-            FormatPatternModifier(FormatPattern.COMPOSER, prefix = " written by ", suffix = ""),
-            FormatPatternModifier(FormatPattern.SPOTIFY_URL, prefix = "\n", suffix = ""),
-            FormatPatternModifier(FormatPattern.YOUTUBE_MUSIC_URL, prefix = "\nYouTube Music: ", suffix = ""),
+            FormatPatternModifier(containingEscapeInfo.formatPatterns[0], prefix = " ", suffix = ""),
+            FormatPatternModifier(containingEscapeInfo.formatPatterns[1], prefix = " - ", suffix = ""),
+            FormatPatternModifier(containingEscapeInfo.formatPatterns[2], prefix = " (", suffix = ")"),
+            FormatPatternModifier(containingEscapeInfo.formatPatterns[3], prefix = " written by ", suffix = ""),
+            FormatPatternModifier(containingEscapeInfo.formatPatterns[4], prefix = "\n", suffix = ""),
+            FormatPatternModifier(containingEscapeInfo.formatPatterns[5], prefix = "\nYouTube Music: ", suffix = ""),
         )
         val actual = containingEscapeInfo.getSharingSubject(formatString, modifiers)
 

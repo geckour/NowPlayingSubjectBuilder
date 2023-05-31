@@ -3,25 +3,13 @@ package com.geckour.nowplayingsubjectbuilder.lib.util
 import com.geckour.nowplayingsubjectbuilder.lib.model.FormatPattern
 import com.geckour.nowplayingsubjectbuilder.lib.model.FormatPatternModifier
 
-val String.containedPatterns: List<FormatPattern>
-    get() = this.splitConsideringEscape().mapNotNull { delimiter ->
-        FormatPattern.values().firstOrNull { it.value == delimiter }
+fun String.getContainedPatterns(formatPatterns: List<FormatPattern>): List<FormatPattern> =
+    this.splitConsideringEscape(formatPatterns).mapNotNull { delimiter ->
+        formatPatterns.firstOrNull { it.key == delimiter }
     }
 
-fun String.splitConsideringEscape(): List<String> =
-    this.splitIncludeDelimiter(
-        FormatPattern.S_QUOTE_DOUBLE.value,
-        FormatPattern.S_QUOTE.value,
-        FormatPattern.TITLE.value,
-        FormatPattern.ARTIST.value,
-        FormatPattern.ALBUM.value,
-        FormatPattern.COMPOSER.value,
-        FormatPattern.SPOTIFY_URL.value,
-        FormatPattern.YOUTUBE_MUSIC_URL.value,
-        FormatPattern.APPLE_MUSIC_URL.value,
-        FormatPattern.PIXEL_NOW_PLAYING.value,
-        "\\\\n"
-    ).let { splitList ->
+fun String.splitConsideringEscape(formatPatterns: List<FormatPattern>): List<String> =
+    this.splitIncludeDelimiter("'", "''", *formatPatterns.map { it.key }.toTypedArray(), "\\\\n").let { splitList ->
         val escapes = splitList.mapIndexed { i, s -> Pair(i, s) }.filter { it.second == "'" }
             .apply { if (lastIndex < 0) return@let splitList }
 
@@ -57,10 +45,10 @@ private fun String.splitIncludeDelimiter(vararg delimiters: String) =
 fun String.withModifiers(
     modifiers: List<FormatPatternModifier>,
     identifier: FormatPattern
-): String = "${modifiers.getPrefix(identifier.value)}$this${modifiers.getSuffix(identifier.value)}"
+): String = "${modifiers.getPrefix(identifier.key)}$this${modifiers.getSuffix(identifier.key)}"
 
 private fun List<FormatPatternModifier>.getPrefix(value: String): String =
-    this.firstOrNull { m -> m.key.value == value }?.prefix ?: ""
+    this.firstOrNull { m -> m.key.key == value }?.prefix ?: ""
 
 private fun List<FormatPatternModifier>.getSuffix(value: String): String =
-    this.firstOrNull { m -> m.key.value == value }?.suffix ?: ""
+    this.firstOrNull { m -> m.key.key == value }?.suffix ?: ""
